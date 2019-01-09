@@ -20,4 +20,8 @@ You can add `--freq_update 1` to specify how frequent the actor is updated to ma
 Performance
 -----------
 
+Number of frames used in training (in millions) versus Evaluation performance.
+
+~10 mins per million frames. 
+
 ![Breakout Performance](imgs/breakout.png "")
