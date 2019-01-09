@@ -1,0 +1,6 @@
+[submodule "ELF"]
+	path = ELF
+	url = https://github.com/pytorch/ELF
+[submodule "atari/Arcade-Learning-Environment"]
+	path = atari/Arcade-Learning-Environment
+	url = https://github.com/mgbellemare/Arcade-Learning-Environment/
