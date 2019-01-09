@@ -79,7 +79,8 @@ class RunGC(object):
             self.GC = elf_C.GameContext(elf_options)
 
         self.game_obj = test.MyContext(options, "actor", "train")
-        self.game_obj.setGameFactory(test.getGameFactory(test.AtariOptions()))
+        self.interface = test.GameInterface(test.AtariOptions())
+        self.game_obj.setInterface(self.interface)
         self.game_obj.setGameContext(self.GC)
         self.params = self.game_obj.getParams()
         spec = self.game_obj.getBatchSpec()

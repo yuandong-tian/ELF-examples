@@ -1,21 +1,13 @@
-ELF RL package
+Atari
 ==============
 
-Run the script
+Run the following command to compile:
 ```
-./install.sh
-```
-
-Then add ELF python path
-```
-export PYTHONPATH=<ELF_DIR>/build/elf:$PYTHONPATH
-export PYTHONPATH=<ELF_DIR>/src_py:$PYTHONPATH
+sh ./install.sh
 ```
 
-Then try running it
+Then start training:
 ```
 cd build
-python -u ../test_elf_python_old.py --gpu 0 --num_game_thread 128 --batchsize 32 --reward_clip 1
+python -u ../run.py --gpu 0 --num_game_thread 128 --batchsize 32 --reward_clip 1
 ```
-
-Note that this uses an old version of A2C (please `git pull` from ELF repo to get the most recent commit from `experimental branch`), which achieves decent performance after 8 hours of training. 

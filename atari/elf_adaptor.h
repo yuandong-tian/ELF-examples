@@ -7,37 +7,46 @@
 #include "atari_game.h"
 #include "elf/interface/snippets.h"
 
-using elf::snippet::GameInterface;
-using elf::snippet::GameFactory;
 using elf::snippet::Reply;
 
-class GameWrapper : public GameInterface {
+class GameInterface : public elf::snippet::Interface {
+ public:
+   GameInterface(const atari::Options &options)
+     : options_(options), example_(0, false, options) {
+      ale::Logger::setMode(ale::Logger::mode::Error);
+   }
+
+   int dim() const override { return example_.obsDim(); }
+   std::vector<int> dims() const override { return {example_.channel(), example_.height(), example_.width()}; }
+   int numActions() const override { return example_.numActions(); }
+
+   std::unordered_map<std::string, int> getParams() const override {
+     return std::unordered_map<std::string, int>{
+       { "num_action", example_.numActions() },
+         { "width", example_.width() },
+         { "height", example_.height() },
+         { "channel", example_.channel() }
+     };
+   }
+
+   elf::snippet::Game *createGame(int idx, bool eval_mode) const override;
+
+ private:
+   const atari::Options options_;
+   atari::Game example_;
+};
+
+class GameWrapper : public elf::snippet::Game {
  public:
   GameWrapper(int idx, bool eval_mode, const atari::Options &options)
     : game_(idx, eval_mode, options) {
-      if (idx == 0) {
-        ale::Logger::setMode(ale::Logger::mode::Error);
-      }
   }
 
   std::vector<float> feature() const override {
     return game_.getObs();
   }
 
-  int dim() const override { return game_.obsDim(); }
-  std::vector<int> dims() const override { return {game_.channel(), game_.height(), game_.width()}; }
-  int numActions() const override { return game_.numActions(); }
-
   void reset() override { game_.reset(); }
-
-  std::unordered_map<std::string, int> getParams() const override {
-     return std::unordered_map<std::string, int>{
-       { "num_action", game_.numActions() },
-         { "width", game_.width() },
-         { "height", game_.height() },
-         { "channel", game_.channel() }
-     };
-  }
 
   // return false if the game has come to an end, and change the reply.
   bool step(Reply *reply) override {
@@ -46,13 +55,10 @@ class GameWrapper : public GameInterface {
     return game_continue;
   }
 
-  static GameFactory getGameFactory(const atari::Options &options) {
-    return GameFactory([options](int idx, bool eval_mode) {
-      return new GameWrapper(idx, eval_mode, options);
-    });
-  }
-
  private:
   atari::Game game_;
 };
 
+inline elf::snippet::Game *GameInterface::createGame(int idx, bool eval_mode) const {
+  return new GameWrapper(idx, eval_mode, options_);
+}

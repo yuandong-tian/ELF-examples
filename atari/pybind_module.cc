@@ -15,5 +15,6 @@ PYBIND11_MODULE(_atari, m) {
   py::class_<atari::Options>(m, "AtariOptions")
     .def(py::init<>());
 
-  m.def("getGameFactory", &GameWrapper::getGameFactory);
+  py::class_<GameInterface, elf::snippet::Interface>(m, "GameInterface")
+    .def(py::init<const atari::Options &>());
 }
