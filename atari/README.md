@@ -30,7 +30,7 @@ Eval:
 Total step: 0.985212M, #step (completed episode): 0.946201M
 Accumulated: 236.441[399], Last episode[16] Avg: 585.688, Min: 354, Max: 864
 ```
-Note that `585.688` is the average reward the evaluation process gets (over the most recent 16 ones). 
+Note that `585.688`/`354`/`864` is the average/min/max episode rewards the evaluation threads get (over the most recent 16 ones). 
 
 Performance
 -----------
