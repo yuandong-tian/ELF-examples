@@ -7,7 +7,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../ELF/src_py'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../ELF/build/elf'))
 
 import elf
-from rl_old import ActorCritic
+#from rl_old import ActorCritic
+from rlpytorch import PPO
 from rl.stats import Stats
 
 import _elf as elf_C
@@ -47,7 +48,7 @@ class RunGC(object):
             'parsed_args',
             'dummy option',
             [])
-        spec.merge(PyOptionSpec.fromClasses((ActorCritic,)))
+        spec.merge(PyOptionSpec.fromClasses((PPO,)))
         return spec
 
     @auto_import_options
@@ -102,7 +103,7 @@ class RunGC(object):
         self.train_model = deepcopy(self.model)
         if self.options.gpu >= 0: self.train_model.cuda(self.options.gpu)
 
-        self.method = ActorCritic(self.option_map)
+        self.method = PPO(self.option_map)
         self.stats = Stats()
         self.optimizer = torch.optim.Adam(self.train_model.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-3)
 

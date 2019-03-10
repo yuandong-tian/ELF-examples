@@ -9,10 +9,15 @@ Run the following command to compile:
 sh ./install.sh
 ```
 
-Then start training using A2C:
+Then start training using PPO:
 ```
 cd build
-python -u ../run.py --gpu 0 --num_game_thread 1024 --batchsize 128 --reward_clip 1 --adv_clip 1.0 --ratio_clamp 1.5
+python -u ../run.py --gpu 0 --num_game_thread 1024 --batchsize 128 --reward_clip 1 
+```
+
+You can also train it with A2C:
+```
+python -u ../run.py --gpu 0 --num_game_thread 1024 --batchsize 128 --reward_clip 1 --adv_clip 1.0 --ratio_clamp 1.5 --use_a2c
 ```
 
 Some switches
@@ -35,7 +40,7 @@ Note that `585.688`/`354`/`864` is the average/min/max episode rewards the evalu
 Performance
 -----------
 
-Number of frames used in training (in millions) versus Evaluation performance.
+Number of frames used in training (in millions) versus Evaluation performance (using A2C):
 
 ~10 mins per million frames. 
 
