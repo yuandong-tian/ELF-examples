@@ -7,13 +7,16 @@
 #include <map>
 
 #include "game.h"
+#include "elf/interface/game_interface.h"
 
 using SpecItem = std::unordered_map<std::string, std::vector<std::string>>;
 using Spec = std::unordered_map<std::string, SpecItem>;
+using elf::Extractor;
+using game::StateAction;
 
 struct FeatureReg {
   static Extractor reg(int batchsize) {
-     using game::StateAction;
+     Extractor e;
      e.addField<float>("s")
        .addExtents(batchsize, {batchsize, StateAction::kStateDim})
        .addFunction<StateAction>(&StateAction::getFeature);
@@ -49,7 +52,7 @@ class MyContext {
      for (int i = 0; i < num_games; ++i) {
        auto* g = ctx->getGame(i);
        if (g != nullptr) {
-         games_.emplace_back(new Game(i, ctx->getClient(), eval_name_));
+         games_.emplace_back(new game::Game(i, ctx->getClient(), eval_name_));
          games_[i]->reset();
          g->setCallbacks(nullptr, std::bind(main_loop, games_[i].get(), _1), nullptr);
        }
@@ -59,6 +62,7 @@ class MyContext {
    }
 
    std::unordered_map<std::string, int> getParams() const {
+     std::unordered_map<std::string, int> params; 
      params["num_action"] = StateAction::kNumAction;
      params["dim"] = StateAction::kStateDim; 
      return params;

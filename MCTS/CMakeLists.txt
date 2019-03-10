@@ -28,6 +28,7 @@ set(ELF_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../ELF)
 include_directories(${ELF_PATH}/src_cpp/)
 include_directories(${ELF_PATH}/third_party/)
 include_directories(${ELF_PATH}/third_party/json/include)
+include_directories(${ELF_PATH}/third_party/concurrentqueue)
 
 add_subdirectory(
     ${ELF_PATH}/third_party/pybind11

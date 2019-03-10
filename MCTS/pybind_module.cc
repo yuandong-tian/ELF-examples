@@ -9,8 +9,6 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(_mcts_demo, m) {
-  elf::snippet::reg_pybind11(m);
-
   py::class_<MyContext>(m, "MyContext")
     .def(py::init<std::string>());
 }
