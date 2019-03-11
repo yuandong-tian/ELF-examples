@@ -46,11 +46,22 @@ struct StateAction {
   float V;
   std::vector<float> pi;
 
-  StateAction(const S &s) : s(s), pi(0, kNumAction) {}
+  StateAction(const S &s) : s(s), V(0), pi(kNumAction, 0) {}
   
   void getFeature(float *f) const { *f = s.s; }
   void setValue(const float *pV) { V = *pV; }
   void setPi(const float *ppi) { std::copy(ppi, ppi + pi.size(), pi.begin()); }
+
+  std::string info() const {
+    std::stringstream ss;
+    ss << "State: " << s.s << ", V: " << V << ", pi: " << pi.size() << "[";
+    for (size_t i = 0; i < pi.size(); ++i) {
+      if (i > 0) ss << ",";
+      ss << pi[i];
+    }
+    ss << "]";
+    return ss.str();
+  }
 };
 
 struct MCTSActorParams {
@@ -94,18 +105,21 @@ class MCTSActor {
 
   void evaluate(const State& s, NodeResponse* resp) {
     if (oo_ != nullptr)
-      *oo_ << "Evaluating state at " << std::hex << &s << std::dec << std::endl;
+      *oo_ << "Evaluating state at " << std::hex << &s << std::dec << ", s = " << s.s << std::endl;
 
     // if terminated(), get results, res = done
     // else res = EVAL_NEED_NN
     if (!s.terminated()) {
       StateAction sa(s);
       if (client_->sendWait(params_.target, sa) == comm::SUCCESS) {
+        // std::cout << "Get sa: " << sa.info() << std::endl;
         resp->q_flip = false;
         resp->value = sa.V;
         resp->pi.clear();
         for (size_t i = 0; i < sa.pi.size(); ++i) {
-          resp->pi.insert(std::make_pair((A)i, elf::ai::tree_search::EdgeInfo(sa.pi[i])));
+          float prob = sa.pi[i]; 
+          A a = (i == 0) ? -1 : 1;
+          resp->pi.insert(std::make_pair(a, elf::ai::tree_search::EdgeInfo(prob)));
         }
       }
     } else {
@@ -162,8 +176,9 @@ class Game {
  public:
   using MCTSAI = elf::ai::tree_search::MCTSAI_T<MCTSActor>;
 
-  Game(int idx, elf::GameClientInterface* client, std::string target) : idx_(idx) {
-    elf::ai::tree_search::TSOptions options;
+  Game(int idx, elf::GameClientInterface* client, 
+       const elf::ai::tree_search::TSOptions& options, 
+       std::string target) : idx_(idx) {
     mcts_.reset(new MCTSAI(options, [=](int) { return new MCTSActor(client, target); }));
   }
 
@@ -172,8 +187,12 @@ class Game {
     
     // Call MCTS and find the best move. 
     A a;
+    std::cout << "Run MCTS with s: " << s_.s << std::endl;
     mcts_->act(s_, &a);
-    // const auto &result = mcts_->getLastResult();
+
+    const auto &result = mcts_->getLastResult();
+    std::cout << "Best action: " << a << ", info: " << result.info() << std::endl;
+
     s_.forward(a);
     return ! s_.terminated();
   }
